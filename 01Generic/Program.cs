@@ -77,6 +77,9 @@ namespace Generic
                 GenericConstraint.Show(hubei);
                 // error: 编译不通过
                 // GenericConstraint.Show(Japanese);
+
+                Console.WriteLine("******** 协变、逆变 *************");
+                CCTest.Show();
             }
             catch (Exception)
             {

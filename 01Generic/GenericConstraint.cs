@@ -30,8 +30,7 @@ namespace Generic
         }
 
         public T GetT<T>(T t)
-            where T : 
-            class // 引用类型约束
+            where T : class // 引用类型约束
             // where T : struct // 值类型约束
             // where T : new() // 无参数构造函数约束
             // where T : int // error: 密封类不能约束，因为没有意义

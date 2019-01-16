@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  generic:
+    image: ${DOCKER_REGISTRY-}generic
+    build:
+      context: .
+      dockerfile: 01Generic/Dockerfile
