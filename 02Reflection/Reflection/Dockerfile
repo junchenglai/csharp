@@ -15,4 +15,4 @@ RUN dotnet publish Generic.csproj -c Debug -o /app
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app .
-ENTRYPOINT ["dotnet", "Generic.dll"]
+ENTRYPOINT ["dotnet", "Reflection.dll"]

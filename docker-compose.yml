@@ -6,3 +6,10 @@ services:
     build:
       context: .
       dockerfile: 01Generic/Dockerfile
+
+  reflection:
+    image: ${DOCKER_REGISTRY-}reflection
+    build:
+      context: .
+      dockerfile: 02Reflection/Reflection/Dockerfile
+
