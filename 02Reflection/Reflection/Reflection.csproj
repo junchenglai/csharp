@@ -1,18 +1,25 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
+    <ApplicationIcon />
+    <Win32Resource />
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Reflection.DB.Interface\Reflection.DB.Interface.csproj"/>
-    <ProjectReference Include="..\Reflection.DB.MySql\Reflection.DB.MySql.csproj"/>
+    <None Remove="appconfig.yml" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.0.0-preview.18572.1"/>
+    <EmbeddedResource Include="appconfig.yml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
-  <ProjectExtensions>
-    <VisualStudio>
-      <UserProperties appsetting_1json__JSONSchema="http://json.schemastore.org/appsettings"/>
-    </VisualStudio>
-  </ProjectExtensions>
+  <ItemGroup>
+    <ProjectReference Include="..\Reflection.DB.Interface\Reflection.DB.Interface.csproj" />
+    <ProjectReference Include="..\Reflection.DB.MySql\Reflection.DB.MySql.csproj" />
+    <ProjectReference Include="..\Reflection.DB.SqlServer\Reflection.DB.SqlServer.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.0.0-preview.18572.1" />
+    <PackageReference Include="NetEscapades.Configuration.Yaml" Version="1.6.0" />
+  </ItemGroup>
 </Project>

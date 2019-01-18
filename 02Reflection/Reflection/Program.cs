@@ -2,9 +2,20 @@
 using System.Reflection;
 using Reflection.DB.Interface;
 using Reflection.DB.MySql;
+using Reflection.DB.SqlServer;
 
 namespace Reflection
 {
+    /// <summary>
+    /// 1 dll-IL-metadata-反射
+    /// 2 反射加载dll，读取 model、类、方法、特性
+    /// 3 反射创建对象，反射+简单工厂+配置文件
+    /// 4 破坏单例 创建泛型
+    /// 5 反射调用实例方法、静态方法、重载方法
+    /// 6 调用私有方法 调用泛型方法
+    /// 7 反射字段和属性，分别获取值和设置值
+    /// 8 反射的好处和局限性
+    /// </summary>
     class Program
     {
         static void Main(string[] args)
@@ -56,6 +67,83 @@ namespace Reflection
                     Console.WriteLine("**** Reflection + Factory + Config ****");
                     IDBHelper iDBHelper = SimpleFactory.CreaterInstance();
                     iDBHelper.Query();
+                    // 程序是可配置的，通过修改配置就可以自动切换
+                    // 没有写死类型，而是通过配置文件执行，反射创建的
+                    // 实现类必须是事先已有的，而且在目录下面
+
+                    // 可扩展：完全不修改原有代码，只是增加新的实现、复制、修改配置，则可以支持新功能
+                    // 反射的动态加载和动态创建对象，以及配置文件结合
+                }
+
+                {
+                    Console.WriteLine("********* ctor + parameter **********");
+                    Type type = Assembly.Load("Reflection.DB.SqlServer")
+                        .GetType("Reflection.DB.SqlServer.ReflectionTest");
+                    IDBHelper iDBHelper1 = Activator.CreateInstance(type) as IDBHelper;
+                    IDBHelper iDBHelper2 = Activator.CreateInstance(type, new object[] { 123 }) as IDBHelper;
+                    IDBHelper iDBHelper3 = Activator.CreateInstance(type, new object[] { "oTest" }) as IDBHelper;
+
+                    foreach (ConstructorInfo ctor in type.GetConstructors())
+                    {
+                        Console.WriteLine(ctor.Name);
+                        foreach (var parameter in ctor.GetParameters())
+                        {
+                            Console.WriteLine(parameter.ParameterType);
+                        }
+                    }
+                }
+
+                {
+                    Console.WriteLine("************ Singleton *************");
+                    Singleton singleton = Singleton.GetInstance();
+                    Singleton singleton1 = Singleton.GetInstance();
+                    Console.WriteLine(ReferenceEquals(singleton, singleton1));
+
+                    Type type = Assembly.Load("Reflection.DB.SqlServer")
+                        .GetType("Reflection.DB.SqlServer.Singleton");
+                    //Singleton singletonA = Activator.CreateInstance(type) as Singleton; // error: 无法实例化单例
+
+                    // 反射破坏单例 —— 就是反射调用私有构造函数
+                    Singleton singletonA = Activator.CreateInstance(type, true) as Singleton;
+                    Singleton singletonB = Activator.CreateInstance(type, true) as Singleton;
+                    Console.WriteLine(ReferenceEquals(singletonA, singletonB));
+                }
+
+                {
+                    Console.WriteLine("********** GenericClass ***********");
+                    Type type = Assembly.Load("Reflection.DB.SqlServer")
+                        .GetType("Reflection.DB.SqlServer.GenericClass`3");
+                    // object oGeneric = Activator.CreateInstance(type); // error: 泛型无法直接实例化
+                    Type typeMake = type.MakeGenericType(new Type[] { typeof(string), typeof(int), typeof(DateTime) });
+                    object oGeneric = Activator.CreateInstance(typeMake);
+                }
+
+                {
+                    Console.WriteLine("********** GenericMethod ***********");
+                    Type type = Assembly.Load("Reflection.DB.SqlServer")
+                        .GetType("Reflection.DB.SqlServer.GenericMethod");
+                    object oGeneric = Activator.CreateInstance(type);
+                }
+
+                {
+                    // 反射创建对象后，知道方法名称，可以直接调用而不需做类型转换
+                    Console.WriteLine("********** GenericMethod ***********");
+                    Type type = Assembly.Load("Reflection.DB.SqlServer")
+                        .GetType("Reflection.DB.SqlServer.ReflectionTest");
+                    object oTest = Activator.CreateInstance(type);
+                    // 直接调用 Show1 方法
+                    foreach (var method in type.GetMethods())
+                    {
+                        Console.WriteLine(method.Name);
+                        foreach (var parameter in method.GetParameters())
+                        {
+                            Console.WriteLine($"{parameter.Name} {parameter.ParameterType}");
+                        }
+                    }
+                    {
+                        MethodInfo method = type.GetMethod("Show1");
+                        method.Invoke(oTest, null);
+                    }
                 }
             }
             catch (Exception)

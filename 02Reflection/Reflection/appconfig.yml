@@ -1,0 +1,3 @@
+DBConfig:
+  DllName: Reflection.DB.MySql
+  TypeName: Reflection.DB.MySql.MySqlHelper
