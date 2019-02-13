@@ -34,9 +34,9 @@ namespace Reflection
                 {
                     Console.WriteLine("************* Reflection ***************");
                     Assembly assembly1 = Assembly.Load("Reflection.DB.MySql"); // 1 动态加载 一个完整的 dll 名称不需要后缀（从 exe 所在的路径进行查找）
-                    Assembly assembly2 = Assembly.LoadFile(@"E:\GitHub\csharp\02Reflection\Reflection.DB.MySql\bin\Debug\netstandard2.0\Reflection.DB.MySql.dll"); // 必须要完整路径
-                    // Assembly assembly3 = Assembly.LoadFrom("Reflection.DB.MySql/Reflection.DB.MySql.dll"); // 当前路径
-                    Assembly assembly4 = Assembly.LoadFrom(@"E:\GitHub\csharp\02Reflection\Reflection.DB.MySql\bin\Debug\netstandard2.0\Reflection.DB.MySql.dll"); //完整路径
+                    // Assembly assembly2 = Assembly.LoadFile(@"E:\GitHub\csharp\02Reflection\Reflection.DB.MySql\bin\Debug\netstandard2.0\Reflection.DB.MySql.dll"); // 必须要完整路径
+                    Assembly assembly3 = Assembly.LoadFrom("Reflection.DB.MySql.dll"); // 当前路径
+                    // Assembly assembly4 = Assembly.LoadFrom(@"E:\GitHub\csharp\02Reflection\Reflection.DB.MySql\bin\Debug\netstandard2.0\Reflection.DB.MySql.dll"); //完整路径
 
                     foreach (var type in assembly1.GetTypes())
                     {
@@ -127,6 +127,11 @@ namespace Reflection
 
                 {
                     // 反射创建对象后，知道方法名称，可以直接调用而不需做类型转换
+                    // 反射创建了对象实例——知道方法的名称——反射调用方法
+                    // dll 名称——类型名称——方法名称——我们就能调用方法
+                    // MVC 依赖这种模式——调用 Action
+                    // http://localhost:9099/home/index 通过路由解析——会调用——HomeController——Index方法
+                    // 相当于浏览器输入时告诉了服务器类型的名称和方法的名称
                     Console.WriteLine("********** GenericMethod ***********");
                     Type type = Assembly.Load("Reflection.DB.SqlServer")
                         .GetType("Reflection.DB.SqlServer.ReflectionTest");
@@ -144,6 +149,37 @@ namespace Reflection
                         MethodInfo method = type.GetMethod("Show1");
                         method.Invoke(oTest, null);
                     }
+                    {
+                        MethodInfo method = type.GetMethod("Show2");
+                        method.Invoke(oTest, new object[] { 123 });
+                    }
+                    {
+                        MethodInfo method = type.GetMethod("Show3", new Type[] { });
+                        method.Invoke(oTest, null);
+                    }
+                    {
+                        MethodInfo method = type.GetMethod("Show3", new Type[] { typeof(int) });
+                        method.Invoke(oTest, new object[] { 123 });
+                    }
+                    {
+                        MethodInfo method = type.GetMethod("Show3", new Type[] { typeof(string) });
+                        method.Invoke(oTest, new object[] { "John" });
+                    }
+                    {
+                        MethodInfo method = type.GetMethod("Show3", new Type[] { typeof(int), typeof(string) });
+                        method.Invoke(oTest, new object[] { 123, "John" });
+                    }
+                    {
+                        MethodInfo method = type.GetMethod("Show3", new Type[] { typeof(string), typeof(int) });
+                        method.Invoke(oTest, new object[] { "John", 123 });
+                    }
+                    {
+                        // 静态方法实例可要可不要
+                        MethodInfo method = type.GetMethod("Show4");
+                        method.Invoke(oTest, new object[] { "John" });
+                        method.Invoke(null, new object[] { "John" });
+                    }
+
                 }
             }
             catch (Exception)
