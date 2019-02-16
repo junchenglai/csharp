@@ -2,6 +2,9 @@ using System;
 
 namespace Reflection.DB.SqlServer
 {
+    /// <summary>
+    /// 反射测试类
+    /// </summary>
     public class ReflectionTest
     {
         #region 
@@ -40,10 +43,16 @@ namespace Reflection.DB.SqlServer
         public void Show3(string name, int id) => Console.WriteLine($"这里是 {GetType()} 的 Show3_4。");
 
         /// <summary>
+        /// 私有方法
+        /// </summary>
+        /// <param name="name"></param>
+        private void Show4 (string name) => Console.WriteLine($"这里是 {GetType()} 的 Show4。");
+        
+        /// <summary>
         /// 静态方法
         /// </summary>
         /// <param name="name"></param>
-        public static void Show4 (string name) => Console.WriteLine($"这里是 {typeof(ReflectionTest)} 的 Show4。");
+        public static void Show5 (string name) => Console.WriteLine($"这里是 {typeof(ReflectionTest)} 的 Show5。");
         #endregion
     }
 }

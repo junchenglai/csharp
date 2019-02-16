@@ -15,6 +15,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Reflection.DB.Interface\Reflection.DB.Interface.csproj" />
+    <ProjectReference Include="..\Reflection.Model\Reflection.Model.csproj" />
     <ProjectReference Include="..\Reflection.DB.MySql\Reflection.DB.MySql.csproj" />
     <ProjectReference Include="..\Reflection.DB.SqlServer\Reflection.DB.SqlServer.csproj" />
   </ItemGroup>

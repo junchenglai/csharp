@@ -35,7 +35,7 @@ namespace Reflection
                     Console.WriteLine("************* Reflection ***************");
                     Assembly assembly1 = Assembly.Load("Reflection.DB.MySql"); // 1 动态加载 一个完整的 dll 名称不需要后缀（从 exe 所在的路径进行查找）
                     // Assembly assembly2 = Assembly.LoadFile(@"E:\GitHub\csharp\02Reflection\Reflection.DB.MySql\bin\Debug\netstandard2.0\Reflection.DB.MySql.dll"); // 必须要完整路径
-                    Assembly assembly3 = Assembly.LoadFrom("Reflection.DB.MySql.dll"); // 当前路径
+                    // Assembly assembly3 = Assembly.LoadFrom("Reflection.DB.MySql.dll"); // 当前路径
                     // Assembly assembly4 = Assembly.LoadFrom(@"E:\GitHub\csharp\02Reflection\Reflection.DB.MySql\bin\Debug\netstandard2.0\Reflection.DB.MySql.dll"); //完整路径
 
                     foreach (var type in assembly1.GetTypes())
@@ -118,20 +118,41 @@ namespace Reflection
                     object oGeneric = Activator.CreateInstance(typeMake);
                 }
 
+                #region 泛型方法
                 {
                     Console.WriteLine("********** GenericMethod ***********");
                     Type type = Assembly.Load("Reflection.DB.SqlServer")
                         .GetType("Reflection.DB.SqlServer.GenericMethod");
                     object oGeneric = Activator.CreateInstance(type);
+                    foreach (MethodInfo item in type.GetMethods())
+                    {
+                        Console.WriteLine(item.Name);
+                    }
+                    MethodInfo method = type.GetMethod("Show");
+                    MethodInfo methodNew = method.MakeGenericMethod(new Type[] { typeof(int), typeof(string), typeof(DateTime) });
+                    methodNew.Invoke(oGeneric, new object[] { 123, "John", DateTime.Now });
                 }
+                {
+                    Console.WriteLine("******* GenericClass&Method ********");
+                    Type type = Assembly.Load("Reflection.DB.SqlServer")
+                        .GetType("Reflection.DB.SqlServer.GenericDouble`1")
+                        .MakeGenericType(typeof(int));
+                    object oObject = Activator.CreateInstance(type);
+                    MethodInfo method = type.GetMethod("Show").MakeGenericMethod(typeof(string), typeof(DateTime));
+                    method.Invoke(oObject, new object[] { 123, "John", DateTime.Now });
+                }
+                #endregion
 
                 {
                     // 反射创建对象后，知道方法名称，可以直接调用而不需做类型转换
                     // 反射创建了对象实例——知道方法的名称——反射调用方法
                     // dll 名称——类型名称——方法名称——我们就能调用方法
                     // MVC 依赖这种模式——调用 Action
-                    // http://localhost:9099/home/index 通过路由解析——会调用——HomeController——Index方法
+                    // http://localhost:9099/home/index 通过路由解析——会调用 HomeController——Index方法
                     // 相当于浏览器输入时告诉了服务器类型的名称和方法的名称
+                    // MVC 加载时会先扫描所有 dll —— 找到所有的控制器 —— 请求来时用Controller 来匹配
+                    // 1 MVC的局限性：Action 重载时，反射是无法区分的，只能通过 HttpMethod + 特性 HttpGet/HttpPost 等
+                    // 2 AOP 反射调用方法，可以在前后插入逻辑
                     Console.WriteLine("********** GenericMethod ***********");
                     Type type = Assembly.Load("Reflection.DB.SqlServer")
                         .GetType("Reflection.DB.SqlServer.ReflectionTest");
@@ -175,12 +196,28 @@ namespace Reflection
                     }
                     {
                         // 静态方法实例可要可不要
-                        MethodInfo method = type.GetMethod("Show4");
+                        MethodInfo method = type.GetMethod("Show5");
                         method.Invoke(oTest, new object[] { "John" });
                         method.Invoke(null, new object[] { "John" });
                     }
-
                 }
+
+                #region 反射调用私有方法
+                {
+                    Console.WriteLine("********* 反射调用私有方法 *********");
+                    Type type = Assembly.Load("Reflection.DB.SqlServer")
+                        .GetType("Reflection.DB.SqlServer.ReflectionTest");
+                    object oTest = Activator.CreateInstance(type);
+                    var method = type.GetMethod("Show4", BindingFlags.Instance | BindingFlags.NonPublic);
+                    object oReturn = method.Invoke(oTest, new object[] { "John" });
+                }
+                #endregion
+
+                #region 
+                {
+                    
+                }
+                #endregion
             }
             catch (Exception)
             {
